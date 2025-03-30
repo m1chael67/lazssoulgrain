@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customize Your Grips | Laz's Soul Grain</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function toggleEngraving() {
+            const engravingRadio = document.getElementById('engravingRadio');
+            const inlayRadio = document.getElementById('inlayRadio');
+            const accentDetails = document.getElementById('accentDetails');
+            const engravingFields = document.getElementById('engravingFields');
+            const inlayFields = document.getElementById('inlayFields');
+            const accentTitle = document.getElementById('accentTitle');
+
+            if (engravingRadio.checked) {
+                accentDetails.style.display = 'block';
+                engravingFields.style.display = 'block';
+                inlayFields.style.display = 'none';
+                accentTitle.innerText = "Engraving";
+            } else if (inlayRadio.checked) {
+                accentDetails.style.display = 'block';
+                engravingFields.style.display = 'none';
+                inlayFields.style.display = 'block';
+                accentTitle.innerText = "Bullet Shell Inlay";
+            } else {
+                accentDetails.style.display = 'none';
+                engravingFields.style.display = 'none';
+                inlayFields.style.display = 'none';
+                accentTitle.innerText = "";
+            }
+        }
+
+        function previewImage(event) {
+            const preview = document.getElementById('imagePreview');
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        }
+
+        function resetAccent() {
+            const radios = document.getElementsByName('accentOption');
+            for (let i = 0; i < radios.length; i++) {
+                radios[i].checked = false;
+            }
+            toggleEngraving();
+        }
+
+        function setDefaultCaliber() {
+            const gunType = document.getElementById('gunType').value;
+            const caliberDropdown = document.getElementById('inlayCaliber');
+
+            if (gunType === "1911" || gunType === "roughrider") {
+                caliberDropdown.value = ".45 ACP";
+            } else if (gunType === "beretta") {
+                caliberDropdown.value = "9mm";
+            }
+        }
+
+        function updatePrice() {
+            const form = document.getElementById('gripForm');
+            let total = 140;
+
+            if (form.thumbGroove.checked) total += 15;
+            if (form.fingerGrooves.checked) total += 50;
+
+            const accent = form.querySelector('input[name="accentOption"]:checked');
+            if (accent) {
+                if (accent.value === "engraving") total += 35;
+                if (accent.value === "inlay") total += 40;
+            }
+
+            document.getElementById('totalPrice').textContent = "Total: $" + total;
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            const form = document.getElementById('gripForm');
+            const gun = form.gunType.value;
+            const wood = form.wood.options[form.wood.selectedIndex].text;
+            const stain = form.stain.value;
+            const thickness = form.thickness.options[form.thickness.selectedIndex].text;
+            const thumbGroove = form.thumbGroove.checked ? "Yes" : "No";
+            const fingerGrooves = form.fingerGrooves.checked ? "Yes" : "No";
+            const torched = form.torched.checked ? "Yes" : "No";
+
+            let accent = "";
+            let detail = "";
+            const engravingRadio = document.getElementById('engravingRadio');
+            const inlayRadio = document.getElementById('inlayRadio');
+
+            if (engravingRadio.checked) {
+                accent = "Engraving";
+                detail = form.engraving.value || "";
+                if (!detail.trim()) {
+                    alert("Please enter engraving text.");
+                    return;
+                }
+            } else if (inlayRadio.checked) {
+                accent = "Bullet Shell Inlay";
+                detail = form.inlayCaliber.value;
+            } else {
+                accent = "None";
+                detail = "N/A";
+            }
+
+            const price = document.getElementById('totalPrice').textContent.replace('Total: $', '');
+
+            const cartItem = {
+                gun, wood, stain, thickness, thumbGroove, fingerGrooves, torched, accent, detail, price
+            };
+
+            let cart = JSON.parse(localStorage.getItem('soulGrainCart')) || [];
+            cart.push(cartItem);
+            localStorage.setItem('soulGrainCart', JSON.stringify(cart));
+
+            alert("Grip added to cart!");
+            window.location.href = "cart.html";
+        }
+
+        window.onload = () => {
+            document.getElementById('gripForm').addEventListener('input', () => {
+                toggleEngraving();
+                updatePrice();
+            });
+        };
+    </script>
+</head>
+<body>
+    
+<header>
+    <div style="text-align:center;">
+        <a href="index.html"><img src="logo.PNG" alt="Laz's Soul Grain Logo" style="width: 150px; height: auto;"></a>
+    </div>
+    <nav>
+        <a href="index.html" >Home</a>
+        <a href="custom-grips.html" class='active'>Customize</a>
+        <a href="shop.html" >Shop</a>
+        <a href="contact.html" >Contact</a>
+        <a href="cart.html" >Cart</a>
+    </nav>
+</header>
+
+
+    <section class="form-section">
+        <h2>Customize Your Grips</h2>
+        <form id="gripForm" onsubmit="submitOrder(event)">
+            <label for="gunType">Gun Type:</label>
+            <select id="gunType" name="gunType" onchange="setDefaultCaliber()">
+                <option value="1911">1911</option>
+                <option value="beretta">Beretta M9</option>
+                <option value="roughrider">Rough Rider</option>
+            </select>
+
+            <hr class="divider">
+            <label for="wood">Wood Type:</label>
+            <select id="wood" name="wood">
+                <option>Walnut</option>
+                <option selected>Maple</option>
+            </select>
+
+            <hr class="divider">
+            <label for="stain">Stain Level:</label>
+            <select id="stain" name="stain">
+                <option>None</option>
+                <option>Light</option>
+                <option>Medium</option>
+                <option>Dark</option>
+            </select>
+
+            <hr class="divider">
+            <label for="thickness">Thickness:</label>
+            <select id="thickness" name="thickness">
+                <option>Standard</option>
+                <option>Slim</option>
+                <option>Wide</option>
+            </select>
+
+            <hr class="divider">
+            <label><input type="checkbox" name="thumbGroove" value="15"> Thumb Groove (+$15)</label>
+            <label><input type="checkbox" name="fingerGrooves" value="50"> Finger Grooves (+$50)</label>
+
+            <hr class="divider">
+            <label><input type="radio" name="accentOption" value="inlay" id="inlayRadio"> Bullet Shell Inlay (+$40)</label>
+            <label><input type="radio" name="accentOption" value="engraving" id="engravingRadio"> Custom Engraving (starting at +$35)</label>
+            <button type="button" class="clear-btn" onclick="resetAccent()">Clear Selection</button>
+
+            <div id="accentDetails" style="display:none;">
+                <hr class="divider">
+                <h3 id="accentTitle" style="color:#b08b4f;"></h3>
+                <div id="engravingFields" style="display:none;">
+                    <input type="text" id="engraving" name="engraving" placeholder="Enter engraving text">
+                    <label>Upload a reference image (optional):</label>
+                    <input type="file" id="engravingImage" name="engravingImage" accept="image/*" class="upload-btn" onchange="previewImage(event)">
+                </div>
+                <div id="inlayFields" style="display:none;">
+                    <label for="inlayCaliber">Select Shell Caliber:</label>
+                    <select id="inlayCaliber" name="inlayCaliber">
+                        <option>.45 ACP</option>
+                        <option>9mm</option>
+                        <option>.357 Magnum</option>
+                    </select>
+                </div>
+            </div>
+            <img id="imagePreview" src="" alt="Image preview" style="display:none; max-width:100%; margin-top:10px; border:1px solid #b08b4f; border-radius:5px;">
+
+            <hr class="divider">
+            <label><input type="checkbox" name="torched" value="0"> Torched</label>
+
+            <div class="total-price" id="totalPrice">Total: $140</div>
+            <button type="submit" class="submit-btn">Add to Cart</button>
+        </form>
+    </section>
+
+    <footer style="text-align:center; padding:20px; font-size:0.9em; background-color: rgba(18, 18, 18, 0.85);">
+        &copy; 2025 Laz's Soul Grain. All rights reserved.
+    </footer>
+</body>
+</html>

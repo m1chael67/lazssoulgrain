@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shop | Laz's Soul Grain</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function addToCart(product) {
+            const cart = JSON.parse(localStorage.getItem('soulGrainCart')) || [];
+            cart.push(product);
+            localStorage.setItem('soulGrainCart', JSON.stringify(cart));
+            alert(product.name + " added to cart!");
+            window.location.href = "cart.html";
+        }
+    </script>
+</head>
+<body>
+    
+<header>
+    <div style="text-align:center;">
+        <a href="index.html"><img src="logo.PNG" alt="Laz's Soul Grain Logo" style="width: 150px; height: auto;"></a>
+    </div>
+    <nav>
+        <a href="index.html" >Home</a>
+        <a href="custom-grips.html" >Customize</a>
+        <a href="shop.html" class='active'>Shop</a>
+        <a href="contact.html" >Contact</a>
+        <a href="cart.html" >Cart</a>
+    </nav>
+</header>
+
+
+    <section class="form-section">
+        <h2>Ready to Ship</h2>
+        <div class="gallery-grid">
+            <div>
+                <img src="grip1.jpeg" alt="Coaster Set" style="max-width:200px;"><br>
+                <strong>Bullet-Shell Coaster Set</strong><br>
+                Made from walnut with real .45 ACP inlay<br>
+                <strong>$60</strong><br>
+                <button class="submit-btn" onclick='addToCart({name: "Coaster Set", type: "Accessory", price: "60"})'>Add to Cart</button>
+            </div>
+            <div>
+                <img src="grip2.jpeg" alt="Ashtray" style="max-width:200px;"><br>
+                <strong>Shell-Inlay Ashtray</strong><br>
+                Solid hardwood with brass accents<br>
+                <strong>$50</strong><br>
+                <button class="submit-btn" onclick='addToCart({name: "Ashtray", type: "Accessory", price: "50"})'>Add to Cart</button>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align:center; padding:20px; font-size:0.9em; background-color: rgba(18, 18, 18, 0.85);">
+        &copy; 2025 Laz's Soul Grain. All rights reserved.
+    </footer>
+</body>
+</html>
